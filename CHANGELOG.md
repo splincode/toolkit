@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.557.0](https://github.com/taiga-family/toolkit/compare/v0.556.0...v0.557.0) (2026-08-31)
+
+### 🚀 Features
+
+- **stylelint-config**: allow dvh unit ([#1982](https://github.com/taiga-family/toolkit/pull/1982))
+  [(5d0b473)](https://github.com/taiga-family/toolkit/commit/5d0b4738cd970787ffda4f501de03e3bff4ae561)
+- `tui-short-import` add exception ([#1981](https://github.com/taiga-family/toolkit/pull/1981))
+  [(6f24290)](https://github.com/taiga-family/toolkit/commit/6f24290bb0f8dfd33a05adcb1e81841ca1c08822)
+
 ## [0.556.0](https://github.com/taiga-family/toolkit/compare/v0.555.0...v0.556.0) (2026-08-14)
 
 ### 🐞 Bug Fixes
