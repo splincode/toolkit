@@ -311,7 +311,7 @@ const config: StylelintConfig = {
                     'focus-visible', // Safari 15+
                     'fullscreen', // Safari 16+
                 ],
-                ignoreUnits: ['svh'],
+                ignoreUnits: ['svh', 'dvh'],
             },
         ],
         'property-disallowed-list': [
@@ -393,6 +393,7 @@ const config: StylelintConfig = {
             'vw',
             'fr',
             'svh',
+            'dvh',
             'lh',
         ],
         'unit-no-unknown': true,
