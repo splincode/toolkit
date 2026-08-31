@@ -79,3 +79,7 @@ caption {
     text-decoration: none dashed currentColor 1px;
     text-decoration-color: color-mix(in lch, currentColor, transparent);
 }
+
+.viewport {
+    block-size: 100dvh;
+}
