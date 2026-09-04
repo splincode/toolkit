@@ -14,7 +14,8 @@
                     "cp {projectRoot}/package.json ./dist/{projectName}"
                 ],
                 "parallel": false
-            }
+            },
+            "outputs": ["{workspaceRoot}/dist/{projectName}"]
         },
         "publish": {
             "dependsOn": [

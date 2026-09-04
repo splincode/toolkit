@@ -10,7 +10,7 @@
             "options": {
                 "command": "tsc --project ./projects/{projectName}/tsconfig.json"
             },
-            "outputs": ["{projectRoot}/projects/{projectName}"]
+            "outputs": ["{projectRoot}/bin"]
         },
         "publish": {
             "dependsOn": [
