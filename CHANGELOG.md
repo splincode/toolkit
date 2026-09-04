@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.558.0](https://github.com/taiga-family/toolkit/compare/v0.557.0...v0.558.0) (2026-09-04)
+
+### 🚀 Features
+
+- **eslint-plugin-experience-next**: add optional Jest config
+  ([#1984](https://github.com/taiga-family/toolkit/pull/1984))
+  [(9661e17)](https://github.com/taiga-family/toolkit/commit/9661e17dd28584184757aaf91a8ff1921bb7b30d)
+
+### 🐞 Bug Fixes
+
+- **release**: restore cached build outputs before publish ([#1985](https://github.com/taiga-family/toolkit/pull/1985))
+  [(7707009)](https://github.com/taiga-family/toolkit/commit/7707009cea1f88e7588c3e268cc2a64eca3bd6d0)
+
 ## [0.557.0](https://github.com/taiga-family/toolkit/compare/v0.556.0...v0.557.0) (2026-08-31)
 
 ### 🚀 Features
