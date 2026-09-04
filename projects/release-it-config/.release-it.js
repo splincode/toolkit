@@ -67,7 +67,7 @@ module.exports = {
             'git fetch --prune --prune-tags origin',
             'git add CHANGELOG.md',
             'npx syncer || echo ""',
-            'npm run after:bump -s || echo ""',
+            'npm run after:bump --if-present -s',
             'git add .',
         ],
         'after:release':
