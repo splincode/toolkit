@@ -1,6 +1,8 @@
 import {createJiti} from 'jiti';
 
 interface StylelintWarning {
+    readonly column?: number;
+    readonly line?: number;
     readonly rule?: string;
     readonly text: string;
 }
@@ -20,12 +22,14 @@ interface StylelintApi {
 
 interface StylelintConfig {
     readonly customSyntax?: unknown;
+    readonly overrides?: readonly unknown[];
     readonly plugins?: readonly unknown[];
     readonly rules: Readonly<Record<string, unknown>>;
 }
 
 interface StylelintLintOptions {
     readonly code: string;
+    readonly codeFilename?: string;
     readonly config: StylelintConfig;
     readonly fix?: boolean;
 }
@@ -57,7 +61,9 @@ export async function lintWithStylelint(
     return {
         code,
         warnings:
-            result?.warnings.map(({rule, text}) => ({
+            result?.warnings.map(({column, line, rule, text}) => ({
+                column,
+                line,
                 rule,
                 text,
             })) ?? [],

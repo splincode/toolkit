@@ -11,7 +11,8 @@
     "include": [
         "./*.ts",
         "configs/**/*.ts",
-        "rules/**/*.ts"
+        "rules/**/*.ts",
+        "syntaxes/**/*.ts"
     ],
     "exclude": ["**/*.spec.ts"]
 }
