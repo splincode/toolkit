@@ -27,8 +27,8 @@ export default {
 
 ## Angular inline styles in TypeScript
 
-The recommended config automatically checks CSS and Less in the `styles` metadata of Angular `@Component` decorators
-in `.ts` files. Add `ts` to your Stylelint file glob:
+The recommended config automatically checks CSS and Less in the `styles` metadata of Angular `@Component` decorators in
+`.ts` files. Add `ts` to your Stylelint file glob:
 
 ```bash
 stylelint '**/*.{less,css,ts}'
@@ -62,8 +62,8 @@ are not reported as duplicates.
 
 TypeScript expressions are not evaluated. References such as `styles: externalStyles` and function calls are skipped.
 Template expressions inside quoted CSS values, such as `[data-tui-version='${TUI_VERSION}']`, are supported when the
-block can be parsed as Less; unparseable dynamic blocks are skipped. Files without extractable component styles are
-left unchanged. This checks component styles, not TypeScript code or inline HTML templates.
+block can be parsed as Less; unparseable dynamic blocks are skipped. Files without extractable component styles are left
+unchanged. This checks component styles, not TypeScript code or inline HTML templates.
 
 ## Configs
 
