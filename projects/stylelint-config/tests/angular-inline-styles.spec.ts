@@ -27,7 +27,90 @@ async function lint(
     });
 }
 
+function lintNative(
+    code: string,
+    rules?: Readonly<Record<string, unknown>>,
+    fix = false,
+): LintOutput {
+    // Native ESM avoids cross-realm PostCSS nodes and presets in Jest's VM.
+    return JSON.parse(
+        execFileSync(
+            process.execPath,
+            [
+                '--input-type=module',
+                '-e',
+                `
+                        import {createJiti} from 'jiti';
+                        import stylelint from 'stylelint';
+
+                        const jiti = createJiti(${JSON.stringify(__filename)});
+                        const config = await jiti.import(
+                            ${JSON.stringify(rules ? '../angular' : '../index')},
+                            {default: true},
+                        );
+                        const result = await stylelint.lint({
+                            code: ${JSON.stringify(code)},
+                            codeFilename: 'test.component.ts',
+                            config: {...config, ...${JSON.stringify(rules ? {rules} : {})}},
+                            fix: ${JSON.stringify(fix)},
+                        });
+
+                        process.stdout.write(JSON.stringify({
+                            code: result.code,
+                            warnings: result.results.flatMap(({warnings}) => warnings),
+                        }));
+                    `,
+            ],
+            {encoding: 'utf8'},
+        ),
+    );
+}
+
 describe('Angular inline styles', () => {
+    it('allows the same import in different components', () => {
+        const code = dedent`
+            @Component({
+                styles: \`[data-tui-version='\${TUI_VERSION}'] {
+                    @import './subheader.style.less';
+                }\`,
+            })
+            export class First {}
+
+            @Component({
+                styles: \`[data-tui-version='\${TUI_VERSION}'] {
+                    @import './subheader.style.less';
+                }\`,
+            })
+            export class Second {}
+        `;
+
+        const result = lintNative(code, {'no-duplicate-at-import-rules': true});
+
+        expect(result.warnings).toEqual([]);
+    });
+
+    it('still reports duplicate imports within one style block', () => {
+        const code = dedent`
+            @Component({
+                styles: \`
+                    @import './subheader.style.less';
+                    @import './subheader.style.less';
+                \`,
+            })
+            export class Test {}
+        `;
+
+        const result = lintNative(code, {'no-duplicate-at-import-rules': true});
+
+        expect(result.warnings).toEqual([
+            expect.objectContaining({
+                column: 9,
+                line: 4,
+                rule: 'no-duplicate-at-import-rules',
+            }),
+        ]);
+    });
+
     it.each([
         {lineBreak: '\n', styles: "':host { color: #ffffff; }'"},
         {lineBreak: '\r\n', styles: "':host { color: #ffffff; }'"},
@@ -42,35 +125,7 @@ import {Component} from '@angular/core';
 @Component({styles: ${styles}})
 export class Test {}`.replaceAll('\n', lineBreak);
 
-            // The full config loads ESM presets that Jest's CommonJS VM cannot import.
-            const result: LintOutput = JSON.parse(
-                execFileSync(
-                    process.execPath,
-                    [
-                        '--input-type=module',
-                        '-e',
-                        `
-                        import {createJiti} from 'jiti';
-                        import stylelint from 'stylelint';
-
-                        const jiti = createJiti(${JSON.stringify(__filename)});
-                        const config = await jiti.import('../index', {default: true});
-                        const result = await stylelint.lint({
-                            code: ${JSON.stringify(code)},
-                            codeFilename: 'test.component.ts',
-                            config,
-                            fix: true,
-                        });
-
-                        process.stdout.write(JSON.stringify({
-                            code: result.code,
-                            warnings: result.results.flatMap(({warnings}) => warnings),
-                        }));
-                    `,
-                    ],
-                    {encoding: 'utf8'},
-                ),
-            );
+            const result = lintNative(code, undefined, true);
 
             expect(result.code).toBe(code.replace('#ffffff', '#fff'));
             expect(result.warnings).toEqual([]);
@@ -365,8 +420,10 @@ export class Test {}`.replaceAll('\n', lineBreak);
         expect(result.code).toBe(code.replace('#ffffff', '#fff'));
     });
 
-    it('applies fixes across styles and preserves code between components', async () => {
-        const code = dedent`
+    it.each(['\n', '\r\n'])(
+        'preserves code between components during autofix (%j)',
+        (lineBreak) => {
+            const code = dedent`
             @Component({
                 styles: [
                     \`.first { color: #ffffff; }\`,
@@ -381,17 +438,18 @@ export class Test {}`.replaceAll('\n', lineBreak);
                 styles: \`.third { border-color: #aabbcc; }\`,
             })
             export class Second {}
-        `;
+        `.replaceAll('\n', lineBreak);
 
-        const result = await lint(code, {'color-hex-length': 'short'}, true);
+            const result = lintNative(code, {'color-hex-length': 'short'}, true);
 
-        expect(result.code).toBe(
-            code
-                .replace('#ffffff', '#fff')
-                .replace('#000000', '#000')
-                .replace('#aabbcc', '#abc'),
-        );
-    });
+            expect(result.code).toBe(
+                code
+                    .replace('#ffffff', '#fff')
+                    .replace('#000000', '#000')
+                    .replace('#aabbcc', '#abc'),
+            );
+        },
+    );
 
     it('preserves a component without extractable styles during autofix', async () => {
         const code = dedent`

@@ -1,4 +1,12 @@
-import {Input, type Node, type ProcessOptions, type Root, root} from 'postcss';
+import {
+    type AnyNode,
+    type Document,
+    document,
+    Input,
+    type Node,
+    type ProcessOptions,
+    type Root,
+} from 'postcss';
 import less from 'postcss-less';
 
 import {extractComponentStyles} from './extract-component-styles';
@@ -24,7 +32,7 @@ function parseStyle(
     }
 }
 
-function parse(sourceInput: Stringifiable, opts: ProcessOptions = {}): Root {
+function parse(sourceInput: Stringifiable, opts: ProcessOptions = {}): Document {
     const source = String(sourceInput);
     const inlineSource = {
         inline: true,
@@ -32,7 +40,7 @@ function parse(sourceInput: Stringifiable, opts: ProcessOptions = {}): Root {
         start: {column: 1, line: 1, offset: 0},
     };
 
-    const output = root({source: inlineSource});
+    const output = document({source: inlineSource});
     let lastNode: Node | null = null;
     let previousRangeEnd = 0;
 
@@ -73,7 +81,9 @@ function parse(sourceInput: Stringifiable, opts: ProcessOptions = {}): Root {
         });
 
         parsed.walk((node) => remapNodeSource(node, source, range.start));
-        output.append(nodes);
+        remapNodeSource(parsed, source, range.start);
+        parsed.source = {...inlineSource, ...parsed.source};
+        output.append(parsed);
         previousRangeEnd = range.end;
         lastNode = nodes[nodes.length - 1] ?? null;
     }
@@ -88,24 +98,22 @@ function parse(sourceInput: Stringifiable, opts: ProcessOptions = {}): Root {
     return output;
 }
 
-function stringify(node: Node, builder: Builder): void {
+function stringify(node: AnyNode, builder: Builder): void {
     const raws = getRaws(node);
 
-    if (node.type !== 'root' || raws.angularSource === undefined) {
+    if (node.type !== 'document' || raws.angularSource === undefined) {
         less.stringify(node, builder);
 
         return;
     }
 
-    const angularRoot = node as Root;
-
-    if (angularRoot.nodes.length === 0) {
+    if (node.nodes.length === 0) {
         builder(raws.angularSource, node);
 
         return;
     }
 
-    for (const child of angularRoot.nodes) {
+    for (const child of node.nodes.flatMap((styleRoot) => styleRoot.nodes)) {
         const childRaws = getRaws(child);
 
         if (childRaws.angularCodeBefore) {
