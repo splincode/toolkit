@@ -1,3 +1,5 @@
+import {execFileSync} from 'node:child_process';
+
 import {describe, expect, it} from '@jest/globals';
 
 import angularConfig from '../angular';
@@ -26,6 +28,55 @@ async function lint(
 }
 
 describe('Angular inline styles', () => {
+    it.each([
+        {lineBreak: '\n', styles: "':host { color: #ffffff; }'"},
+        {lineBreak: '\r\n', styles: "':host { color: #ffffff; }'"},
+        {lineBreak: '\n', styles: "''"},
+        {lineBreak: '\n', styles: 'externalStyles'},
+    ])(
+        'lints and fixes $styles with the full config ($lineBreak)',
+        ({lineBreak, styles}) => {
+            const code = `
+import {Component} from '@angular/core';
+
+@Component({styles: ${styles}})
+export class Test {}`.replaceAll('\n', lineBreak);
+
+            // The full config loads ESM presets that Jest's CommonJS VM cannot import.
+            const result: LintOutput = JSON.parse(
+                execFileSync(
+                    process.execPath,
+                    [
+                        '--input-type=module',
+                        '-e',
+                        `
+                        import {createJiti} from 'jiti';
+                        import stylelint from 'stylelint';
+
+                        const jiti = createJiti(${JSON.stringify(__filename)});
+                        const config = await jiti.import('../index', {default: true});
+                        const result = await stylelint.lint({
+                            code: ${JSON.stringify(code)},
+                            codeFilename: 'test.component.ts',
+                            config,
+                            fix: true,
+                        });
+
+                        process.stdout.write(JSON.stringify({
+                            code: result.code,
+                            warnings: result.results.flatMap(({warnings}) => warnings),
+                        }));
+                    `,
+                    ],
+                    {encoding: 'utf8'},
+                ),
+            );
+
+            expect(result.code).toBe(code.replace('#ffffff', '#fff'));
+            expect(result.warnings).toEqual([]);
+        },
+    );
+
     it('reports Stylelint warnings at the original TypeScript location', async () => {
         const code = dedent`
             import {Component} from '@angular/core';

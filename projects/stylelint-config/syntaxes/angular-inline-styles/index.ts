@@ -1,4 +1,4 @@
-import {type Node, type ProcessOptions, type Root, root} from 'postcss';
+import {Input, type Node, type ProcessOptions, type Root, root} from 'postcss';
 import less from 'postcss-less';
 
 import {extractComponentStyles} from './extract-component-styles';
@@ -26,7 +26,13 @@ function parseStyle(
 
 function parse(sourceInput: Stringifiable, opts: ProcessOptions = {}): Root {
     const source = String(sourceInput);
-    const output = root();
+    const inlineSource = {
+        inline: true,
+        input: new Input(source, opts),
+        start: {column: 1, line: 1, offset: 0},
+    };
+
+    const output = root({source: inlineSource});
     let lastNode: Node | null = null;
     let previousRangeEnd = 0;
 
