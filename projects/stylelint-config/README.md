@@ -1,6 +1,6 @@
 # @taiga-ui/stylelint-config
 
-Common Stylelint configuration for Taiga UI projects.
+Common Stylelint configuration for Taiga UI projects, including Angular inline styles in TypeScript files.
 
 ```bash
 npm i -D stylelint @taiga-ui/stylelint-config
@@ -24,6 +24,46 @@ export default {
   extends: ['@taiga-ui/stylelint-config', '@taiga-ui/stylelint-config/taiga-specific'],
 };
 ```
+
+## Angular inline styles in TypeScript
+
+The recommended config automatically checks CSS and Less in the `styles` metadata of Angular `@Component` decorators
+in `.ts` files. Add `ts` to your Stylelint file glob:
+
+```bash
+stylelint '**/*.{less,css,ts}'
+```
+
+To apply autofixes:
+
+```bash
+stylelint '**/*.{less,css,ts}' --fix
+```
+
+Both a single string and an array of strings are supported, including template literals:
+
+```ts
+import {Component} from '@angular/core';
+
+@Component({
+  template: '',
+  styles: `
+    :host {
+      color: #ffffff;
+    }
+  `,
+})
+export class ExampleComponent {}
+```
+
+For example, `--fix` changes `#ffffff` to `#fff` while preserving the surrounding TypeScript. Diagnostics point to the
+original TypeScript locations. Each style block is checked independently, so matching imports in different components
+are not reported as duplicates.
+
+TypeScript expressions are not evaluated. References such as `styles: externalStyles` and function calls are skipped.
+Template expressions inside quoted CSS values, such as `[data-tui-version='${TUI_VERSION}']`, are supported when the
+block can be parsed as Less; unparseable dynamic blocks are skipped. Files without extractable component styles are
+left unchanged. This checks component styles, not TypeScript code or inline HTML templates.
 
 ## Configs
 
