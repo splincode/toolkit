@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.560.0](https://github.com/taiga-family/toolkit/compare/v0.559.0...v0.560.0) (2026-09-07)
+
+### 🚀 Features
+
+- **stylelint-config**: support Angular inline styles ([#1986](https://github.com/taiga-family/toolkit/pull/1986))
+  [(29bc01e)](https://github.com/taiga-family/toolkit/commit/29bc01e4c7a00b6ce8496b4e9ba43ff4dcce3990)
+
 ## [0.559.0](https://github.com/taiga-family/toolkit/compare/v0.558.0...v0.559.0) (2026-09-04)
 
 This release contains internal technical improvements only. No changes to functionality, UI, or APIs.
