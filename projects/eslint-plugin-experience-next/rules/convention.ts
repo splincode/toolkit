@@ -25,6 +25,92 @@ export const TUI_RECOMMENDED_NAMING_CONVENTION = [
         selector: 'variable',
     },
     {
+        filter: {
+            match: true,
+            regex: '^__[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*__
+    {
+        custom: {
+            match: true,
+            regex: String.raw`^[\x00-\x7F]+$`,
+        },
+        format: null,
+        selector: 'parameter',
+    },
+    {
+        format: ['camelCase'],
+        selector: 'function',
+    },
+] as const;
+
+export const TUI_CUSTOM_TAIGA_NAMING_CONVENTION = [
+    ...TUI_RECOMMENDED_NAMING_CONVENTION,
+    {
+        format: ['PascalCase'],
+        modifiers: ['exported'],
+        prefix: ['Tui', 'AbstractTui'],
+        selector: ['class', 'interface', 'typeAlias', 'typeLike', 'enum'],
+    },
+    {
+        format: ['PascalCase'],
+        modifiers: ['exported'],
+        prefix: ['tui', 'provide'],
+        selector: 'function',
+    },
+] as const;
+
+export const TUI_MEMBER_ORDERING_CONVENTION = [
+    'signature',
+    'readonly-signature',
+    'public-static-field',
+    'protected-static-field',
+    '#private-static-field',
+    'private-static-field',
+    'private-decorated-field',
+    'protected-abstract-field',
+    'public-abstract-field',
+    'private-decorated-field',
+    'private-instance-field',
+    '#private-instance-field',
+    [
+        'protected-decorated-field',
+        'public-decorated-field',
+        'protected-instance-field',
+        'public-instance-field',
+    ],
+    'private-constructor',
+    'protected-constructor',
+    'public-constructor',
+    'public-static-method',
+    'protected-static-method',
+    'private-static-method',
+    '#private-static-method',
+    'public-abstract-get',
+    'public-abstract-set',
+    'protected-abstract-get',
+    'protected-abstract-set',
+    'public-abstract-method',
+    'protected-abstract-method',
+    ['public-decorated-set', 'public-decorated-get'],
+    ['public-set', 'public-get'],
+    'public-decorated-method',
+    'public-instance-method',
+    ['protected-decorated-set', 'protected-decorated-get'],
+    ['protected-set', 'protected-get'],
+    'protected-decorated-method',
+    'protected-instance-method',
+    ['private-decorated-set', 'private-decorated-get'],
+    ['private-set', 'private-get'],
+    'private-decorated-method',
+    'private-instance-method',
+    '#private-instance-method',
+] as const;
+,
+        },
+        format: null,
+        modifiers: ['const'],
+        selector: 'variable',
+    },
+    {
         custom: {
             match: true,
             regex: String.raw`^[\x00-\x7F]+$`,
